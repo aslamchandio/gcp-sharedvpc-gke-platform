@@ -49,3 +49,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# ---- Local-only real-value var backups (never publish) ----
+.local-tfvars-backup/

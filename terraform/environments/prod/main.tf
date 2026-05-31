@@ -1,6 +1,6 @@
 ###############################################################################
-# dev/main.tf
-# Composition: wire the reusable modules for the dev environment.
+# prod/main.tf
+# Composition: wire the reusable modules for the prod environment.
 #
 # Ordering:
 #   apis ──▶ network ─┐
@@ -12,14 +12,14 @@
 ###############################################################################
 
 module "apis" {
-  source = "../modules/apis"
+  source = "../../modules/apis"
 
   host_project_id    = var.host_project_id
   service_project_id = var.service_project_id
 }
 
 module "network" {
-  source = "../modules/network"
+  source = "../../modules/network"
 
   host_project_id        = var.host_project_id
   service_project_id     = var.service_project_id
@@ -34,7 +34,7 @@ module "network" {
 }
 
 module "iam" {
-  source = "../modules/iam"
+  source = "../../modules/iam"
 
   host_project_id    = var.host_project_id
   service_project_id = var.service_project_id
@@ -46,7 +46,7 @@ module "iam" {
 }
 
 module "gke" {
-  source = "../modules/gke"
+  source = "../../modules/gke"
 
   service_project_id = var.service_project_id
   region             = var.region

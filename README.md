@@ -28,10 +28,11 @@ HOST project                          SERVICE project
 ```
 .
 └── terraform/
-    ├── modules/   apis · network · iam · gke   (reusable, parameterised)
-    ├── dev/       fast, disposable                  (GCS state prefix dev/)
-    ├── prod/      regional, hardened                (GCS state prefix prod/)
-    └── README.md  ← full guide
+    ├── modules/            apis · network · iam · gke   (reusable, parameterised)
+    ├── environments/
+    │   ├── dev/            fast, disposable             (GCS state prefix dev/)
+    │   └── prod/           regional, hardened           (GCS state prefix prod/)
+    └── README.md           ← full guide
 ```
 
 Each environment is an independent **root module** with its own GCS state prefix
@@ -42,7 +43,7 @@ per-env `*.auto.tfvars`.
 
 ```bash
 git clone https://github.com/aslamchandio/gcp-sharedvpc-gke-platform.git
-cd gcp-sharedvpc-gke-platform/terraform/dev   # or prod
+cd gcp-sharedvpc-gke-platform/terraform/environments/dev   # or environments/prod
 
 # edit network.auto.tfvars + gke.auto.tfvars (projects, CIDRs, authorized networks)
 terraform init

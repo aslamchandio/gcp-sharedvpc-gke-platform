@@ -2,8 +2,8 @@
 
 Reusable Terraform modules that provision a **Shared VPC in a host project** and a
 **private GKE cluster in a service project**, composed per environment under
-`dev/` and `prod/`. Every resource is named with an `it-<env>-*` convention so the
-two environments are visually and logically distinct.
+`environments/dev/` and `environments/prod/`. Every resource is named with an
+`it-<env>-*` convention so the two environments are visually and logically distinct.
 
 ```
 terraform/
@@ -12,16 +12,19 @@ terraform/
 │   ├── network/     # Shared VPC host+attach, subnets (slice), proxy subnet, Router+NAT, firewall
 │   ├── iam/         # GKE robot identity, Shared-VPC subnet IAM (least-priv), dedicated node SA
 │   └── gke/         # private cluster + system node pool (zonal/regional toggle, NAP)
-├── dev/             # ZONAL, fast, disposable        (state prefix: dev/shared-vpc-gke)
-│   ├── main.tf  versions.tf  backend.tf  variables.tf  outputs.tf  locals.tf
-│   ├── network.auto.tfvars   # projects, region, naming, labels, subnets, CIDRs
-│   └── gke.auto.tfvars       # cluster, nodes, release, control-plane access
-├── prod/            # REGIONAL, hardened              (state prefix: prod/shared-vpc-gke)
-│   ├── main.tf  versions.tf  backend.tf  variables.tf  outputs.tf  locals.tf
-│   ├── network.auto.tfvars
-│   └── gke.auto.tfvars
+├── environments/
+│   ├── dev/         # fast, disposable               (state prefix: dev/shared-vpc-gke)
+│   │   ├── main.tf  versions.tf  backend.tf  variables.tf  outputs.tf  locals.tf
+│   │   ├── network.auto.tfvars   # projects, region, naming, labels, subnets, CIDRs
+│   │   └── gke.auto.tfvars       # cluster, nodes, release, control-plane access
+│   └── prod/        # REGIONAL, hardened             (state prefix: prod/shared-vpc-gke)
+│       ├── main.tf  versions.tf  backend.tf  variables.tf  outputs.tf  locals.tf
+│       ├── network.auto.tfvars
+│       └── gke.auto.tfvars
 └── compute-class.yaml   # Custom Compute Class (applied via ArgoCD, not Terraform)
 ```
+
+> Env roots reference shared modules with `source = "../../modules/<name>"`.
 
 Each environment is an independent **root module** with its own GCS state prefix.
 Modules are shared and parameterised. State backend: GCS bucket
@@ -260,7 +263,7 @@ checkov -d .            # policy scan
 
 ```bash
 # Destroy an environment (dev or prod)
-cd terraform/prod
+cd terraform/environments/prod
 terraform destroy        # blocked if deletion_protection = true in state
 ```
 

@@ -1,8 +1,25 @@
-
+###############################################################################
+# prod/network.auto.tfvars   (auto-loaded by Terraform)
+# Network module inputs. Project IDs live in prod/terraform.tfvars.
+###############################################################################
 
 # ---- VPC subnets -------------------------------------------------------------
 # Subnet names are bare suffixes -> prefixed to it-prod-<name> in locals.tf.
 # network/proxy names are derived (it-prod-vpc / it-prod-proxy).
+
+# region must match the first (GKE) subnet's region below.
+region = "us-central1"
+
+# ---- Naming / tagging (shared by network + gke; drives it-dev-* names) -------
+business_division = "it"
+environment_name  = "prod"
+
+labels = {
+  environment = "prod"
+  team        = "platform"
+  managed-by  = "terraform"
+}
+
 subnet_definitions = [
   {
     name          = "gke-us-central1" # -> it-prod-gke
