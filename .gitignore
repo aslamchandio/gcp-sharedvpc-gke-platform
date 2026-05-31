@@ -1,0 +1,51 @@
+# ---- Terraform ----
+# Local .terraform directories (providers, modules, plugin cache)
+**/.terraform/*
+
+# State files — remote backend (GCS) is the source of truth; never commit state
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Saved plan artifacts (may contain sensitive values)
+*.tfplan
+tfplan
+*.tfplan.*
+
+# Override files (local-only experiments)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config / credentials
+.terraformrc
+terraform.rc
+
+# Restored state scratch files
+restore.tfstate
+
+# ---- Secrets / credentials (never commit) ----
+*.json.key
+*-key.json
+*-credentials.json
+application_default_credentials.json
+*.pem
+
+# NOTE: .terraform.lock.hcl IS committed (pins provider versions) — do not ignore it.
+# NOTE: *.auto.tfvars ARE committed here (no secrets; project IDs/CIDRs only).
+
+# ---- Local-only notes (kept on disk, not published) ----
+CLAUDE.md
+SKILL.md
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

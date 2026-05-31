@@ -1,0 +1,59 @@
+# compute-class.yaml
+# GKE Custom Compute Class (CRD) — applied via GitOps/ArgoCD per project standards
+# (NOT kubectl apply in production). Node auto-provisioning (enabled in gke.tf)
+# fulfils these priorities within the cluster_autoscaling resource limits.
+#
+# Reference: https://cloud.google.com/kubernetes-engine/docs/concepts/about-custom-compute-classes
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: cost-optimized
+spec:
+  # Ordered fallback: try cheaper/spot first, fall back to on-demand.
+  priorities:
+    - machineFamily: e2
+      spot: true
+    - machineFamily: n2
+      spot: true
+    - machineFamily: n2
+      spot: false
+  # When higher-priority (e.g. Spot) capacity is reclaimed, actively migrate
+  # workloads down the priority list.
+  activeMigration:
+    optimizeRulePriority: true
+  nodePoolAutoCreation:
+    enabled: true
+---
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: high-performance
+spec:
+  # Spot-first with on-demand fallback so NAP creates Spot nodes when capacity
+  # exists and falls back to on-demand only when Spot is unavailable/reclaimed.
+  priorities:
+    - machineFamily: c3
+      minCores: 8
+      spot: true
+    - machineFamily: c2
+      minCores: 8
+      spot: true
+    - machineFamily: c3
+      minCores: 8
+      spot: false
+  activeMigration:
+    optimizeRulePriority: true
+  nodePoolAutoCreation:
+    enabled: true
+
+# Example workload selecting a compute class:
+#
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: catalog-api
+# spec:
+#   template:
+#     spec:
+#       nodeSelector:
+#         cloud.google.com/compute-class: cost-optimized
