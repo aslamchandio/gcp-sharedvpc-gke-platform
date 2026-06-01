@@ -6,6 +6,18 @@ Production-grade, modular Terraform for a **cross-project private GKE platform o
 
 ---
 
+## 📐 Reference diagrams
+
+**Step-by-step build guide** — project structure → provider → network → APIs → IAM → cluster → deploy → verify:
+
+![GKE Private Cluster on Shared VPC — step-by-step guide](docs/images/01-step-by-step-guide.png)
+
+**Architecture & project structure** — Host/Service projects, subnets, IAM, connectivity, data flow, and best practices:
+
+![GKE Private Cluster on Shared VPC — architecture and project structure](docs/images/02-architecture.png)
+
+---
+
 ## What this provisions
 
 ```
