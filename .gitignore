@@ -36,7 +36,9 @@ restore.tfstate
 application_default_credentials.json
 *.pem
 
-# NOTE: .terraform.lock.hcl IS committed (pins provider versions) — do not ignore it.
+# Provider lock files — kept out of the public repo by request.
+**/.terraform.lock.hcl
+
 # NOTE: *.auto.tfvars ARE committed here (no secrets; project IDs/CIDRs only).
 
 # ---- Local-only notes (kept on disk, not published) ----
