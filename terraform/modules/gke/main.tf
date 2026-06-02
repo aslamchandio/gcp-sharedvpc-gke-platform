@@ -117,12 +117,28 @@ resource "google_container_cluster" "primary" {
 
   datapath_provider = "ADVANCED_DATAPATH" # Dataplane V2 (eBPF) for network policy
 
+  # ---- Gateway API (preferred over legacy Ingress) ----
+  # CHANNEL_STANDARD installs the GA Gateway API CRDs + GKE controller, enabling
+  # gke-l7-* GatewayClasses. CHANNEL_DISABLED would remove them.
+  gateway_api_config {
+    channel = "CHANNEL_STANDARD"
+  }
+
   monitoring_config {
     # WORKLOADS monitoring was removed after GKE 1.24; Managed Prometheus
     # collects workload metrics on modern clusters instead.
     enable_components = ["SYSTEM_COMPONENTS"]
     managed_prometheus {
       enabled = true
+    }
+
+    # ---- Dataplane V2 observability (requires ADVANCED_DATAPATH above) ----
+    # enable_metrics: Dataplane V2 metrics (pod/policy flow metrics to Cloud
+    #   Monitoring). enable_relay: Dataplane V2 Observability flow-logging relay
+    #   (Hubble), surfaced in the GKE "DPv2 observability" UI / `kubectl` flows.
+    advanced_datapath_observability_config {
+      enable_metrics = true
+      enable_relay   = true
     }
   }
 

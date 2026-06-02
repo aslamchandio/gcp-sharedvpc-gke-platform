@@ -33,6 +33,7 @@ HOST project                          SERVICE project
 
 - **Shared VPC** host/service attachment, subnets (sliced), proxy-only subnet for Gateway API, Cloud Router + Cloud NAT for private-node egress, deny-all ingress firewall baseline.
 - **Private GKE** cluster (no public node IPs), VPC-native, Dataplane V2 (eBPF), Workload Identity, Shielded nodes, dedicated least-privilege node service account.
+- **Gateway API** (`CHANNEL_STANDARD`) for L7 traffic — preferred over legacy Ingress — plus **Dataplane V2 observability**: flow **metrics** and the flow-logging **relay** (Hubble) streamed to Cloud Monitoring.
 - **Node Auto-Provisioning (NAP)** backing Custom Compute Classes; on-demand `system` pool always on; an **optional** Spot `default` pool gated by `default_pool_enabled` (currently disabled in both envs).
 
 ## Layout

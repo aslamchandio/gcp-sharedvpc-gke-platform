@@ -122,6 +122,34 @@ production cluster.
 
 Security posture is identical in both: private nodes, Workload Identity, Shielded
 nodes, Dataplane V2 (eBPF), deny-all ingress baseline, dedicated least-priv node SA.
+**Gateway API** and **Dataplane V2 observability** (below) are also enabled
+cluster-wide in both — they live in the shared `gke` module, not per-env tfvars.
+
+---
+
+## Gateway API & Dataplane V2 observability
+
+Three cluster-wide features are enabled directly in the shared `gke` module
+(`modules/gke/main.tf`), so **both dev and prod get them with no per-env tfvars** —
+flip them in one place and every environment inherits the change.
+
+| Feature | Terraform | What it gives you |
+|---|---|---|
+| **Gateway API** | `gateway_api_config { channel = "CHANNEL_STANDARD" }` | Installs the GA Gateway API CRDs + GKE controller → `gke-l7-*` GatewayClasses. Preferred over legacy Ingress; pairs with the proxy-only subnet already provisioned by the `network` module. |
+| **Dataplane V2 metrics** | `monitoring_config { advanced_datapath_observability_config { enable_metrics = true } }` | Pod- and policy-level flow **metrics** exported to Cloud Monitoring. |
+| **Dataplane V2 observability (relay)** | `…{ enable_relay = true }` | Flow-logging **relay (Hubble)** — surfaced in the GKE "DPv2 observability" UI and via `kubectl` flow queries. |
+
+> Both DPv2 observability flags **require** `datapath_provider = "ADVANCED_DATAPATH"`
+> (Dataplane V2), which this module already sets. Enabling them is an **in-place**
+> cluster update (`1 to change`, no recreate) but the control-plane reconfig can take
+> 10–20 min.
+
+Verify:
+```bash
+kubectl get gatewayclass                       # expect gke-l7-* classes
+gcloud container clusters describe <cluster> --region <region> --project <service-project> \
+  --format="value(monitoringConfig.advancedDatapathObservabilityConfig)"
+```
 
 ---
 
@@ -318,3 +346,7 @@ public NAT.
   can reach it; set `true` + run Terraform from a private runner for full isolation.
 - `min_master_version` (`kubernetes_version`) is a **floor** — when the release channel
   auto-upgrades above it there is no perpetual plan diff.
+- **Gateway API + Dataplane V2 observability** are hardcoded in the shared `gke` module
+  (not flag-gated) because both envs want them identically — a single module edit covers
+  dev and prod (DRY). Promote them to `var`s only if an env needs to opt out. See
+  "Gateway API & Dataplane V2 observability".
